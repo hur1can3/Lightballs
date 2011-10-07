@@ -1,4 +1,4 @@
-// final.cpp
+// lightballs.c
 // Authors: Matthew Levandowski
 //          Paul Levandoski
 //          Kyle Johnson
