@@ -1,28 +1,31 @@
-program_NAME := lightballs
-program_C_SRCS := $(wildcard *.c)
-program_CXX_SRCS := $(wildcard *.cpp)
-program_C_OBJS := ${program_C_SRCS:.c=.o}
-program_CXX_OBJS := ${program_CXX_SRCS:.cpp=.o}
-program_OBJS := $(program_C_OBJS) $(program_CXX_OBJS)
-program_FLAGS := -g -Wall
-program_INCLUDE_DIRS :=
-program_LIBRARY_DIRS :=
-program_LIBRARIES := glut GL GLU
+#	Makefile for Lightballs opengl glut
 
-CPPFLAGS += $(foreach includedir,$(program_INCLUDE_DIRS),-I$(includedir))
-LDFLAGS += $(foreach librarydir,$(program_LIBRARY_DIRS),-L$(librarydir))
-LDFLAGS += $(foreach library,$(program_LIBRARIES),-l$(library))
+OS = $(shell uname -s)
+APPS = lightballs
+OBJ = $(APPS).o
+SRC = $(APPS).c
 
-.PHONY: all clean distclean
-
-all: $(program_NAME)
-
-$(program_NAME): $(program_OBJS)
-	$(LINK.cc) $(program_FLAGS) $(program_OBJS) -o $(program_NAME)
+CFLAGS = $(C_OPTS) -I/usr/include
+ifeq ($(OS), Darwin)
+	LIBS = -framework GLUT -framework OpenGL -framework Cocoa 
+else
+	LIBS = -L/usr/X11R6/lib -lX11 -lXi -lglut -lGL -lGLU -lm -lpthread
+endif
+  
+application:$(APPS)
 
 clean:
-	@- $(RM) $(program_NAME)
-	@- $(RM) $(program_OBJS)
+	rm -f $(APPS) *.raw *.o core a.out
 
-distclean: clean
+realclean:	clean
+	rm -f *~ *.bak *.BAK
 
+.SUFFIXES: c o
+.c.o:
+	$(CC) -c $(CFLAGS) $<
+
+$(APPS): $(OBJ) 
+	$(CC) -o $(APPS) $(CFLAGS) $(OBJ) $(LIBS)
+
+depend:
+	makedepend -- $(CFLAGS) $(SRC)
